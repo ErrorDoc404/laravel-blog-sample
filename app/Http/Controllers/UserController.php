@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 
 class UserController extends Controller
 {
@@ -23,7 +26,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('user/create');
     }
 
     /**
@@ -34,7 +37,20 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = new User();
+        $user->name=$request->name;
+        $user->email = $request->emailid;
+        $user->password = bcrypt($request->password);
+        $user->contact = $request->contact;
+        $user->gender = $request->gender;
+        $user->dob = $request->dob;
+        if(Input::hasFile('file')){
+            $file = Input::file('file');
+            $file->move('uploads/images/profile', $file->getClientOriginalName());
+            $user->image_id = $file->getClientOriginalName();
+        }
+        $user->save();
+        return Redirect::route('user');
     }
 
     /**

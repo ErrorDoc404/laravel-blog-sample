@@ -35,3 +35,6 @@ Route::get('image','ImageController@index')->name('image.index');
 Route::get('image/{id}','ImageController@show')->name('image.show');
 Route::delete('image/{id}','ImageController@destroy')->name('image.destroy');
 Route::delete('image/{id}','ImageController@destroy')->name('image.destroy');
+
+Route::get('user/create','UserController@create')->name('user.create');
+Route::post('user','UserController@store')->name('user.store');
