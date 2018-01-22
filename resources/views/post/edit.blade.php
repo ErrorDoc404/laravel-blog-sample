@@ -36,7 +36,11 @@
                             <div class="form-group">
                                 <label for="author" class="col-md-4 control-label">Author</label>
                                 <div class="col-md-6">
-                                    <input id="author" type="text" class="form-control" name="author" value="{{  Auth::user() ?  Auth::user()->name : 'Guest' }}"   />
+                                    <select name="author" id="author" class="form-control">
+                                        @foreach($users as $key => $user)
+                                            <option value="{{$user->id}}" {{$editPost->user_id==$user->id ? 'selected="selected' :  ''}}>{{$user->name}}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div class="clearfix"></div>
                             </div>

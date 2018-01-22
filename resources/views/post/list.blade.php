@@ -4,6 +4,16 @@
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
+                @if (session('post.store'))
+                    <div class="alert alert-success">
+                        {{ session('post.store') }}
+                    </div>
+                @endif
+                @if (session('post.destroy'))
+                    <div class="alert alert-success">
+                        {{ session('post.destroy') }}
+                    </div>
+                @endif
                 <div class="panel panel-default">
                     <div class="panel-heading">Post</div>
                         <div class="panel-body">
@@ -18,12 +28,16 @@
                                         <tr>
                                             <td>{{ $post->id  }}</td>
                                             <td>{{ $post->title  }}</td>
-                                            <td>{{ $post->author  }}</td>
+                                            <td>
+                                                {{$post->user->name}}
+                                            </td>
                                             <td><a href="{{route('post.show',['id'=>$post->id])}}"><button type="submit"  class="btn btn-success form-control" value="{{ $post->id  }}">View</button></a> </td>
                                             <td><form method="post" action="{{route('post.destroy',['id'=>$post->id])}}">{{csrf_field()}} <input type="hidden" name="_method" value="DELETE"/> <button type="submit" class="btn btn-danger form-control" value="{{ $post->id  }}">Delete</button></form></td>
                                         </tr>
                                     @endforeach
                                 </table>
+
+                            {{$posts->links()}}
                         </div>
                 </div>
             </div>

@@ -5,10 +5,9 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Create New Post</div>
-
+                    <div class="panel-heading">Edit Post</div>
                     <div class="panel-body">
-                        {!! Form::open(['route' => 'user.store' , 'method' => 'post' , 'enctype' => 'multipart/form-data' ]) !!}
+                        {!! Form::model($editUser,['route' => ['user.update' , 'id'=>$editUser->id],'method' => 'put' , 'enctype' => 'multipart/form-data' ]) !!}
                             @if ($errors->any())
                                 <div class="alert alert-danger">
                                     <ul>
@@ -21,55 +20,41 @@
                             <div class="form-group">
                                 {!! Form::label('name','Name' , array('class'=>'col-md-4 control-label')) !!}
                                 <div class="col-md-6">
-                                    {!! Form::text('text' ,null , array('id'=>'name' , 'class'=>'form-control', 'name'=>'name','autofocus')) !!}
+                                    {!! Form::text('name',$editUser->name,array('id'=>'name','class'=>'form-control')) !!}
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="form-group">
-                                {!! Form::label('email','E-Mail Address' , array('class'=>'col-md-4 control-label')) !!}
+                                {!! Form::label('contact','Contact' , array('class'=>'col-md-4 control-label')) !!}
                                 <div class="col-md-6">
-                                    {!! Form::email('email' ,null , array('id'=>'email' , 'class'=>'form-control', 'name'=>'email')) !!}
-                                </div>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="form-group">
-                                {!! Form::label('password','Password' , array('class'=>'col-md-4 control-label')) !!}
-                                <div class="col-md-6">
-                                    {!! Form::password('password' , array( 'id'=>'password','class'=>'form-control', 'name'=>'password')) !!}
-                                </div>
-                                <div class="clearfix"></div>
-                            </div>
-                            <div class="form-group">
-                                {!! Form::label('contact','Phone Number' , array('class'=>'col-md-4 control-label')) !!}
-                                <div class="col-md-6">
-                                    {!! Form::text('text' ,null , array('id'=>'contact' , 'class'=>'form-control', 'name'=>'contact')) !!}
+                                    {!! Form::text('contact',$editUser->contact,array('id'=>'contact','class'=>'form-control')) !!}
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="form-group">
                                 {!! Form::label('gender','Gender' , array('class'=>'col-md-4 control-label')) !!}
                                 <div class="col-md-6">
-                                    {!! Form::select('gender',[''=>'-------------------------------','male'=>'Male','female'=>'Female'],null,['class'=>'form-control']) !!}
+                                    {!! Form::select('gender',[''=>'-------------------------------','male'=>'Male','female'=>'Female'],$editUser->gender,['class'=>'form-control']) !!}
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="form-group">
                                 {!! Form::label('dob','Date of Birth' , array('class'=>'col-md-4 control-label')) !!}
                                 <div class="col-md-6">
-                                    {!! Form::date('dob',null,array('id'=>'dob','class'=>'form-control')) !!}
+                                    {!! Form::date('dob',$editUser->dob,array('id'=>'dob','class'=>'form-control')) !!}
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="form-group">
-                                {!! Form::label('file','Select Profile Picture' , array('class'=>'col-md-4 control-label')) !!}
+                                {!! Form::label('image','Change Image' , array('class'=>'col-md-4 control-label')) !!}
                                 <div class="col-md-6">
-                                    {!! Form::file('file',array('id'=>'file','class'=>'form-control')) !!}
+                                    {!! Form::file('image',array('id'=>'image','class'=>'form-control')) !!}
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
                             <div class="form-group">
                                 <center>
-                                    {!! Form::submit('Add User',array('class'=>'btn btn-primary','name'=>'submit')) !!}
+                                    {!! Form::submit('Submit Post',array('class'=>'btn btn-primary')) !!}
                                 </center>
                                 <div class="clearfix"></div>
                             </div>

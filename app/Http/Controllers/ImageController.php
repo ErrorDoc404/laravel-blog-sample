@@ -17,7 +17,7 @@ class ImageController extends Controller
      */
     public function index()
     {
-        $images = Image::all();
+        $images = Image::paginate(3 );
         return view('image/list',compact('images'));
     }
 

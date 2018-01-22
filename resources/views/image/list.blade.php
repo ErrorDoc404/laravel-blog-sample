@@ -22,6 +22,7 @@
                                 </tr>
                             @endforeach
                         </table>
+                        {{$images->links()}}
                     </div>
                 </div>
             </div>

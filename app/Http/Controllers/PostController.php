@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\File;
+use App\User;
+use App;
 
 
 class PostController extends Controller
@@ -20,7 +22,12 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::paginate(3 );
+        $postJoin = DB::table('posts')
+            ->join('images','posts.image_id','=','images.id')
+            ->join('users','posts.user_id','=','users.id')
+            ->get();
+        dd($postJoin);
         return view('post/list',compact('posts'));
     }
 
@@ -31,7 +38,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('post/create');
+        $users = User::all();
+        return view('post/create',compact('users'));
     }
 
     /**
@@ -52,7 +60,7 @@ class PostController extends Controller
         $this->validate($request,[
             'title' => 'required|min:2|max:15|unique:posts',
             'description' => 'required|max:191',
-            'author' => 'required|exists:users,name',
+            'author' => 'required|exists:users,id',
             'name' => 'required|max:5120',
         ],$message);
         $imageValue=null;
@@ -69,9 +77,9 @@ class PostController extends Controller
         $post->image_id = $imageValue==null ? 0 : $imageValue;
         $post->title = $request->title;
         $post->description = $request->description;
-        $post->author = $request->author;
+        $post->user_id = $request->author;
         $post->save();
-        return Redirect::route('post.index');
+        return Redirect::route('post.index')->with('post.store','New post created Successfully');
     }
 
     /**
@@ -82,9 +90,8 @@ class PostController extends Controller
      */
     public function show($id)
     {
-        $selectedPost = Post::find($id);
-        $selectedImage = Image::find($selectedPost->image_id);
-        return view('post/show',compact('selectedPost'),compact('selectedImage'));
+        $post = Post::findorfail($id);
+        return view('post/show',compact('post'));
     }
 
     /**
@@ -97,7 +104,8 @@ class PostController extends Controller
     {
         $editPost = Post::find($id);
         $editImage = Image::find($editPost->image_id);
-        return view('post/edit',compact('editPost'),compact('editImage'));
+        $users = User::all();
+        return view('post/edit',compact('editPost','editImage','users'));
     }
 
     /**
@@ -117,12 +125,11 @@ class PostController extends Controller
         $this->validate($request,[
             'title' => 'required|min:2|max:15',
             'description' => 'required|max:191',
-            'author' => 'required||exists:posts',
         ],$message);
         $post = Post::find($id);
         $post->title = $request->title;
         $post->description = $request->description;
-        $post->author = $request->author;
+        $post->user_id = $request->author;
         $post->save();
         if(Input::hasFile('name')){
             $image = Image::find($post->image_id);
@@ -133,7 +140,7 @@ class PostController extends Controller
             $image->name = $file->getClientOriginalName();
             $image->save();
         }
-        return Redirect::route('post.show',$id);
+        return Redirect::route('post.show',$id)->with('post.update','post update successfully');
     }
 
     /**
@@ -151,7 +158,7 @@ class PostController extends Controller
         $image->delete();
         $pathOfImage = public_path().'/uploads/images/'.$image->name;
         File::delete($pathOfImage);
-        return Redirect::route('post.index');
+        return Redirect::route('post.index')->with('post.destroy','Selected post delete Successfully');
     }
 
     /**

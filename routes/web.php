@@ -13,7 +13,7 @@
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 Auth::routes();
 
@@ -27,6 +27,15 @@ Route::group(['middleware' => 'auth'],function (){
     Route::put('post/{id}','PostController@update')->name('post.update');
     Route::delete('post/{id}','PostController@destroy')->name('post.destroy');
     Route::get('post/{id}/edit','PostController@edit')->name('post.edit');
+
+    Route::get('user/create','UserController@create')->name('user.create');
+    Route::post('user','UserController@store')->name('user.store');
+    Route::get('user/{id}','UserController@show')->name('user.show');
+    Route::get('user','UserController@index')->name('user.index');
+    Route::put('user/{id}','UserController@update')->name('user.update');
+    Route::delete('user/{id}','UserController@destroy')->name('user.destroy');
+    Route::get('user/{id}/edit','UserController@edit')->name('user.edit');
+
 });
 
 Route::get('image/create','ImageController@create')->name('image.create');
@@ -35,6 +44,3 @@ Route::get('image','ImageController@index')->name('image.index');
 Route::get('image/{id}','ImageController@show')->name('image.show');
 Route::delete('image/{id}','ImageController@destroy')->name('image.destroy');
 Route::delete('image/{id}','ImageController@destroy')->name('image.destroy');
-
-Route::get('user/create','UserController@create')->name('user.create');
-Route::post('user','UserController@store')->name('user.store');
