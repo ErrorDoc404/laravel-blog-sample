@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\File;
 use App\User;
+use App\Tag;
+use App\PostTag;
 use App;
 
 
@@ -23,11 +25,6 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::paginate(3 );
-        $postJoin = DB::table('posts')
-            ->join('images','posts.image_id','=','images.id')
-            ->join('users','posts.user_id','=','users.id')
-            ->get();
-        dd($postJoin);
         return view('post/list',compact('posts'));
     }
 
@@ -39,7 +36,8 @@ class PostController extends Controller
     public function create()
     {
         $users = User::all();
-        return view('post/create',compact('users'));
+        $tags = Tag::all();
+        return view('post/create',compact('users','tags'));
     }
 
     /**
@@ -57,14 +55,15 @@ class PostController extends Controller
             'exists' => 'The :attribute is not available as :exists',
             'name.required' => 'Select Image to Upload',
         ];
-        $this->validate($request,[
+        $this->validate($request, [
             'title' => 'required|min:2|max:15|unique:posts',
             'description' => 'required|max:191',
             'author' => 'required|exists:users,id',
             'name' => 'required|max:5120',
-        ],$message);
-        $imageValue=null;
-        if(Input::hasFile('name')){
+            'tags' => 'required',
+        ], $message);
+        $imageValue = null;
+        if (Input::hasFile('name')) {
             $image = new Image();
             $file = Input::file('name');
             $file->move('uploads/images', $file->getClientOriginalName());
@@ -74,11 +73,26 @@ class PostController extends Controller
 //            dd($imageValue);
         }
         $post = new Post();
-        $post->image_id = $imageValue==null ? 0 : $imageValue;
+        $post->image_id = $imageValue == null ? 0 : $imageValue;
         $post->title = $request->title;
         $post->description = $request->description;
         $post->user_id = $request->author;
         $post->save();
+        $count = count($request->tags);
+        $tag_id [] = null;
+        for($i=0;$i<$count;$i++){
+            if((int)$request->tags[$i] == null){
+                $tag = new Tag();
+                $tag->name = strtolower($request->tags[$i]);
+                $tag->status = 'inactive';
+                $tag->display_name = $request->tags[$i];
+                $tag->save();
+                $tag_id[$i] = $tag->id;
+            }elseif((int)$request->tags[$i] != null){
+                $tag_id[$i] = $request->tags[$i];
+            }
+        }
+        $post->tag()->attach($tag_id);
         return Redirect::route('post.index')->with('post.store','New post created Successfully');
     }
 
@@ -102,10 +116,11 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        $editPost = Post::find($id);
-        $editImage = Image::find($editPost->image_id);
+        $post = Post::find($id);
         $users = User::all();
-        return view('post/edit',compact('editPost','editImage','users'));
+        $tags = Tag::all();
+        $post_tags = $post->tag->toArray();
+        return view('post/edit',compact('post','users','tags','post_tags'));
     }
 
     /**
@@ -125,12 +140,28 @@ class PostController extends Controller
         $this->validate($request,[
             'title' => 'required|min:2|max:15',
             'description' => 'required|max:191',
+            'tags' => 'required',
         ],$message);
         $post = Post::find($id);
         $post->title = $request->title;
         $post->description = $request->description;
         $post->user_id = $request->author;
         $post->save();
+        $count = count($request->tags);
+        $tag_id [] = null;
+        for($i=0;$i<$count;$i++){
+            if((int)$request->tags[$i] == null){
+                $tag = new Tag();
+                $tag->name = strtolower($request->tags[$i]);
+                $tag->status = 'inactive';
+                $tag->display_name = $request->tags[$i];
+                $tag->save();
+                $tag_id[$i] = $tag->id;
+            }elseif((int)$request->tags[$i] != null){
+                $tag_id[$i] = $request->tags[$i];
+            }
+        }
+        $post->tag()->sync($tag_id);
         if(Input::hasFile('name')){
             $image = Image::find($post->image_id);
             $pathOfImage = public_path().'/uploads/images/'.$image->name;
